@@ -14,7 +14,9 @@ import Data.Text qualified as T
 import Database.SQLite.Simple
 import Database.SQLite.Simple.FromRow
 import Database.SQLite.Simple.ToRow
+import GHC.Generics (Constructor (conName))
 import Network.Wai (Response)
+import Server (makeResponse)
 import System.Random (Random (randomR), RandomGen, getStdRandom, randomRIO)
 
 data Quote = Quote T.Text T.Text T.Text
@@ -47,8 +49,14 @@ instance ToRow Int where
 handlePush :: Quote -> Response
 handlePush = undefined
 
-handlePull :: DBPull -> Response
-handlePull = undefined
+handlePull :: DBPull -> Connection -> Response
+handlePull a conn =
+  let getReq GetAll = getAll
+      getReq GetNum = getNum
+      getReq GetRand = getRand
+   in do
+        req <- getReq a conn
+        makeResponse status200 $ encode req
 
 ----------------
 
