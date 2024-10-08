@@ -2,8 +2,6 @@
 
 module Database
   ( create,
-    handlePush,
-    handlePull,
     DBPull (GetAll, GetRand, GetNum),
     Quote,
   )
@@ -19,7 +17,7 @@ import Network.Wai (Response)
 import Server (makeResponse)
 import System.Random (Random (randomR), RandomGen, getStdRandom, randomRIO)
 
-data Quote = Quote T.Text T.Text T.Text
+data Quote = Quote T.Text T.Text T.Text deriving (Show)
 
 data DBPull = GetAll | GetRand | GetNum
 
@@ -44,21 +42,6 @@ instance ToRow Quote where
 
 instance ToRow Int where
   toRow = toRow
-
---- HANDLERS ---
-handlePush :: Quote -> Response
-handlePush = undefined
-
-handlePull :: DBPull -> Connection -> Response
-handlePull a conn =
-  let getReq GetAll = getAll
-      getReq GetNum = getNum
-      getReq GetRand = getRand
-   in do
-        req <- getReq a conn
-        makeResponse status200 $ encode req
-
-----------------
 
 -- creates the connection and creates a table "quotes" if necessary
 create :: IO Connection

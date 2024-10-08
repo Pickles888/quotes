@@ -43,3 +43,20 @@ serveNotFound path =
 makeResponse :: Status -> T.Text -> Response
 makeResponse status text =
   responseLBS status [] (B.fromStrict (encodeUtf8 text))
+
+--- HANDLERS ---
+handlePush :: Quote -> Connection -> Response
+handlePush q c = add q c >> makeResponse status200 $ (T.pack "Added: " ++ show q)
+
+handlePull :: DBPull -> Connection -> Response
+handlePull a conn = do
+  req <- case a of
+    GetAll -> getAll conn
+    GetRand -> getRand conn
+    GetNum -> getNum conn
+  makeResponse status200 $ encode req
+
+
+
+----------------
+
